@@ -1,0 +1,39 @@
+{
+	"manifest_version": 3,
+
+	"name": "TriagingPlugin",
+	"description": "Triaging Extension for Chrome",
+	"version": "1.3",
+	"author": "@aagarwal6",
+
+	"background": {
+		"service_worker": "background.js"
+	},
+
+	"permissions": [
+		"tabs",
+		"activeTab",
+		"storage",
+		"scripting"
+	],
+	"host_permissions": [
+		"https://blrbugzilla.yodlee.com/*"
+	],
+	"permissions": [
+		"tabs",
+		"activeTab",
+		"storage",
+		"scripting"
+	],
+	"action": {
+		"default_icon": "logo.png",
+		"default_popup": "popup.html"
+	},
+	"content_scripts": [
+		{
+			"matches": ["https://blrbugzilla.yodlee.com/*"],
+			"js": ["content1.js"],
+			"run_at": "document_start"
+		}
+	]
+}
