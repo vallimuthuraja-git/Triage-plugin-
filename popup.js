@@ -689,21 +689,15 @@ function updateBugIdDisplay(bugId) {
 function showCopyFeedback(copiedAge) {
     const bugAgeElement = document.getElementById('bugage');
 
-    // Store current display state
-    const originalDisplay = bugAgeElement.style.display;
+    // Store original content
     const originalInnerHTML = bugAgeElement.innerHTML;
 
-    // Temporarily hide the age display and show "Copied!" message
-    bugAgeElement.style.display = 'none';
-    bugAgeElement.insertAdjacentHTML('afterend', '<div id="copy-feedback" style="color: #28a745; font-weight: bold; font-family: \'Segoe UI\', Tahoma, sans-serif; font-size: 12px; position: absolute; right: 0; top: 2px;">Copied!</div>');
+    // Replace content with "COPIED" message
+    bugAgeElement.innerHTML = '<span style="color: #28a745; font-weight: bold;">COPIED</span>';
 
-    // Restore after 1 second
+    // Restore original content after 1 second
     setTimeout(function() {
-        const feedbackElement = document.getElementById('copy-feedback');
-        if (feedbackElement) {
-            feedbackElement.remove();
-        }
-        bugAgeElement.style.display = originalDisplay;
+        bugAgeElement.innerHTML = originalInnerHTML;
     }, 1000);
 
     console.log('Age copied to clipboard:', copiedAge);

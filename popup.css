@@ -414,13 +414,13 @@ h3 {
 }
 
 #bugid {
-    font-family: 'Segoe UI', Tahoma, sans-serif;
+    font-family: Arial, sans-serif;
     font-size: 14px;
     font-weight: 700;
     color: var(--text-accent);
     background-color: var(--bg-tertiary);
     padding: 3px 8px 3px 5px;
-    border-radius: 6px;
+    border-radius: 8px;
     border: 1px solid var(--border-secondary);
     border-style: solid;
     border-width: 1px;
@@ -490,42 +490,29 @@ h3 {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 1px;
-    min-width: 170px;
-    height: 24px;
-    padding: 3px 8px 3px 5px;
+    gap: 3px;
+    min-width: 100px;
+    height: 18px;
+    padding: 2px 6px 2px 4px;
     margin-right: 8px;
 
     /* Typography */
-    font-family: 'Segoe UI', Tahoma, sans-serif;
-    font-size: 14px;
+    font-family: Arial, sans-serif;
+    font-size: 12px;
     font-weight: 700;
     line-height: 1;
     color: var(--text-accent);
 
     /* Visual styling */
     background-color: var(--bg-tertiary);
-    border: 1px solid var(--border-secondary);
-    border-radius: 6px;
+    border: 1px solid #e0e7ff;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 8px;
 
     /* Interaction */
     cursor: pointer;
     user-select: none;
-    transition: all 0.2s ease;
-}
-
-/* Age Display Hover State */
-#bugage:hover {
-    background-color: var(--bg-secondary);
-    border-color: var(--border-primary);
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* Age Display Active State */
-#bugage:active {
-    transform: translateY(0);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 /* Clock Icon */
@@ -543,24 +530,25 @@ h3 {
     position: relative;
     vertical-align: bottom;
     margin-bottom: -1px;
-    font-family: 'Segoe UI', Tahoma, sans-serif;
+    font-family: Arial, sans-serif;
     font-size: 14px;
-    font-weight: 900;
+    font-weight: normal;
 }
 
 /* Unit Letters (d, h, m, s) */
 .unit-letter {
     vertical-align: bottom;
-    margin-left: 6px;
-    font-family: 'Segoe UI', Tahoma, sans-serif;
+    margin-left: 2px;
+    margin-right: 6px;
+    font-family: Arial, sans-serif;
     font-size: 14px;
-    font-weight: 900;
+    font-weight: normal;
     color: var(--text-primary);
 }
 
 .digit-stack {
     display: inline-block;
-    width: 6px;
+    width: 7px;
     height: 14px;
     overflow: hidden;
     position: relative;
@@ -607,7 +595,7 @@ h3 #bugage.age-medium::before {
 h3 #bugage.age-old {
     color: var(--error);
     background-color: var(--bg-secondary);
-    border-color: var(--error);
+    border-color: #ff6b6b;
 }
 
 h3 #bugage.age-old::before {
