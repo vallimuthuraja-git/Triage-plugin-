@@ -48,6 +48,30 @@
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
+
+
+/* Force light theme override */
+body.force-light {
+    /* Light theme variables to override system dark preference */
+    --bg-primary: #f9f9f9 !important;
+    --bg-secondary: #ffffff !important;
+    --bg-tertiary: #f8fafc !important;
+    --text-primary: #333333 !important;
+    --text-secondary: #666666 !important;
+    --text-accent: #2563eb !important;
+    --border-primary: #e2e8f0 !important;
+    --border-secondary: #d1e0ff !important;
+    --border-tertiary: #ccc !important;
+    --button-primary: #007bff !important;
+    --button-hover: #0056b3 !important;
+    --button-secondary: #dc3545 !important;
+    --button-secondary-hover: #c82333 !important;
+    --success: #28a745 !important;
+    --error: #dc3545 !important;
+    --warning: #ffc107 !important;
+    --info: #17a2b8 !important;
+}
+
 body {
     width: 350px;
     font-family: Arial, sans-serif;
@@ -61,13 +85,13 @@ body {
 /* Settings Button */
 .settings-button {
     position: absolute;
-    top: 10px;
-    right: 10px;
-    background: var(--button-primary);
-    border: 1px solid var(--button-hover);
-    color: white;
-    width: 32px;
-    height: 32px;
+    top: 2px; /* Moved higher */
+    left: 2px; /* Switched to left side */
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text-secondary);
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
     cursor: pointer;
     font-size: 16px;
@@ -79,12 +103,9 @@ body {
 }
 
 .settings-button:hover {
-    background: var(--button-hover);
-    transform: scale(1.05);
-}
-
-.settings-button:active {
-    transform: scale(0.95);
+    background: var(--bg-tertiary);
+    border-color: var(--border-primary);
+    color: var(--text-primary);
 }
 
 /* Settings Panel */
@@ -374,6 +395,24 @@ h3 {
     position: relative;
 }
 
+.whiteboard-heading {
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: bold;
+    margin: 10px 0 5px 0;
+    border-bottom: 1px solid var(--border-primary);
+    padding-bottom: 3px;
+    position: relative;
+}
+
+.whiteboard-heading #reset-whiteboard {
+    position: absolute;
+    right: 0;
+    top: 0;
+    font-size: 11px;
+    padding: 2px 8px;
+}
+
 #bugid {
     font-family: 'Segoe UI', Tahoma, sans-serif;
     font-size: 14px;
@@ -397,30 +436,29 @@ h3 {
 }
 
 #refreshData {
-    background: var(--button-primary);
-    border: 1px solid var(--button-hover);
-    color: white;
-    cursor: pointer;
-    font-size: 14px;
-    padding: 2px 6px;
+    position: absolute;
+    top: 2px; /* Moved higher and switched places */
+    right: 2px; /* Positioned at right: 2px */
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text-secondary);
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
-    transition: all 0.2s ease;
-    margin-left: 10px;
-    position: relative;
-    top: -2px;
-    transform-origin: center;
-    width: 30px;
-    height: 30px;
-    display: inline-flex;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
     align-items: center;
     justify-content: center;
+    z-index: 1001;
+    transition: all 0.2s ease;
     box-sizing: border-box;
 }
 
 #refreshData:hover {
-    background: var(--button-hover);
-    border-color: var(--text-primary);
-    transform: translateY(-1px);
+    background: var(--bg-tertiary);
+    border-color: var(--border-primary);
+    color: var(--text-primary);
 }
 
 #refreshData:disabled {
@@ -444,34 +482,105 @@ h3 {
     animation: spin 1s linear infinite;
 }
 
-h3 #bugage {
+/* Age Display Container */
+#bugage {
     position: absolute;
     right: 0;
     top: 2px;
-    font-family: 'Segoe UI', Tahoma, sans-serif;
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--text-accent);
-    background-color: var(--bg-tertiary);
-    padding: 3px 8px 3px 5px;
-    border-radius: 6px;
-    border: 1px solid var(--border-secondary);
-    user-select: none; /* Prevent text selection on click */
     display: inline-flex;
     align-items: center;
-    gap: 3px;
-    min-width: 100px; /* Fixed width to prevent resizing */
     justify-content: center;
+    gap: 1px;
+    min-width: 170px;
     height: 24px;
+    padding: 3px 8px 3px 5px;
+    margin-right: 8px;
+
+    /* Typography */
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    font-size: 14px;
+    font-weight: 700;
     line-height: 1;
+    color: var(--text-accent);
+
+    /* Visual styling */
+    background-color: var(--bg-tertiary);
+    border: 1px solid var(--border-secondary);
+    border-radius: 6px;
+
+    /* Interaction */
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s ease;
 }
 
-h3 #bugage::before {
+/* Age Display Hover State */
+#bugage:hover {
+    background-color: var(--bg-secondary);
+    border-color: var(--border-primary);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Age Display Active State */
+#bugage:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Clock Icon */
+#bugage::before {
     content: "\23F1";
     font-size: 16px;
     color: var(--text-secondary);
-    opacity: 1;
     font-weight: 900;
+    margin-right: 2px;
+}
+
+/* Scrolling Digit Containers */
+.digit-container {
+    display: inline-block;
+    position: relative;
+    vertical-align: bottom;
+    margin-bottom: -1px;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    font-size: 14px;
+    font-weight: 900;
+}
+
+/* Unit Letters (d, h, m, s) */
+.unit-letter {
+    vertical-align: bottom;
+    margin-left: 6px;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    font-size: 14px;
+    font-weight: 900;
+    color: var(--text-primary);
+}
+
+.digit-stack {
+    display: inline-block;
+    width: 6px;
+    height: 14px;
+    overflow: hidden;
+    position: relative;
+    line-height: 14px;
+    margin-right: -1px;
+}
+
+.digit-stack span {
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 14px;
+    line-height: 14px;
+    text-align: center;
+    transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    top: 0;
+}
+
+.digit-scroll.scroll-down {
+    top: 14px;
 }
 
 /* Age-based color coding */
@@ -845,32 +954,19 @@ button:active {
     color: var(--text-secondary);
     font-size: 12px;
     font-weight: bold;
-    margin: 0 0 5px 0;
+    margin: 0 0 8px 0;
     text-align: center;
 }
 
 .frequent-tag-buttons {
     display: flex;
     flex-wrap: wrap;
-    margin-bottom: 8px;
-    gap: 2px;
+    margin-bottom: 10px;
     justify-content: center;
 }
 
 .frequent-tag-buttons button {
-    background-color: var(--button-primary);
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    margin: 2px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 12px;
-    transition: background-color 0.3s;
-}
-
-.frequent-tag-buttons button:hover {
-    background-color: var(--button-hover);
+    font-size: 12px !important;
 }
 
 .search-section {

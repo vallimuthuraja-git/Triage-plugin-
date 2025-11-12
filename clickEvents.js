@@ -895,31 +895,47 @@ $(function(){
 function toggleTheme(isDark) {
     const body = document.body;
     if (isDark) {
+        body.classList.remove('force-light');
         body.classList.add('dark-theme');
         // Save preference
         chrome.storage.local.set({'darkMode': true});
     } else {
+        body.classList.add('force-light');
         body.classList.remove('dark-theme');
         // Save preference
         chrome.storage.local.set({'darkMode': false});
     }
 }
 
-// Initialize theme on popup load
+// Initialize theme with stored preference only
 function initializeTheme() {
+    // Check chrome storage for theme preference
     chrome.storage.local.get('darkMode', function(result) {
-        const isDark = result.darkMode || false;
+        const storedPreference = result.darkMode;
+
+        // Use stored preference if available, otherwise default to light
+        const isDark = storedPreference === true;
+
         const themeToggle = document.getElementById('theme-toggle');
 
+        // Apply theme based on stored preference
         if (isDark) {
+            document.body.classList.remove('force-light');
             document.body.classList.add('dark-theme');
-            if (themeToggle) themeToggle.checked = true;
         } else {
+            document.body.classList.add('force-light');
             document.body.classList.remove('dark-theme');
-            if (themeToggle) themeToggle.checked = false;
+        }
+
+        // Update toggle state
+        if (themeToggle) {
+            themeToggle.checked = isDark;
         }
     });
 }
+
+// Apply theme immediately on script load to prevent flicker
+initializeTheme();
 
 // Add search functionality when DOM is loaded
 $(document).ready(function() {
@@ -935,7 +951,4 @@ $(document).ready(function() {
 
     // Initialize grouped tag buttons
     updateGroupedTagButtons();
-
-    // Initialize theme
-    initializeTheme();
 });

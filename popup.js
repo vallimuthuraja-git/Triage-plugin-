@@ -237,7 +237,7 @@ function injectContentScript(tabId) {
 }
 
 /**
- * Update age display with live seconds
+ * Update age display with live seconds and scrolling digit animation
  * @param {Object} bugData - Bug creation data {timestamp, idleDays}
  */
 function updateAgeDisplay(bugData) {
@@ -255,6 +255,12 @@ function updateAgeDisplay(bugData) {
     const bugTimestamp = new Date(bugData.timestamp).getTime();
     const idleMs = (bugData.idleDays || 0) * 24 * 60 * 60 * 1000;
 
+    // Initialize the digit display structure
+    initializeDigitDisplay();
+
+    // Store previous values for animation (initialize to 0 to avoid initial animation)
+    let prevDays = 0, prevHours = 0, prevMinutes = 0, prevSeconds = 0;
+
     function calculateAndDisplayAge() {
         const now = Date.now();
         let ageMs = now - bugTimestamp;
@@ -269,15 +275,22 @@ function updateAgeDisplay(bugData) {
         const days = Math.floor(ageinseconds / 86400);
         const hours = Math.floor((ageinseconds % 86400) / 3600);
         const minutes = Math.floor((ageinseconds % 3600) / 60);
-        const seconds = String(Math.floor(ageinseconds % 60)).padStart(2, '0');
+        const seconds = Math.floor(ageinseconds % 60);
 
-        const ageString = days + "d " + hours + "h " + minutes + "m " + seconds + "s";
-        const ageDisplay = document.getElementById('bugage');
+        // Update digits with animation
+        updateDigitsWithAnimation('days', prevDays, days);
+        updateDigitsWithAnimation('hours', prevHours, hours);
+        updateDigitsWithAnimation('minutes', prevMinutes, minutes);
+        updateDigitsWithAnimation('seconds', prevSeconds, seconds);
 
-        // Update age text
-        ageDisplay.innerHTML = "Age: " + ageString;
+        // Update previous values
+        prevDays = days;
+        prevHours = hours;
+        prevMinutes = minutes;
+        prevSeconds = seconds;
 
         // Apply age-based styling
+        const ageDisplay = document.getElementById('bugage');
         updateAgeStyling(ageDisplay, days);
     }
 
@@ -286,6 +299,164 @@ function updateAgeDisplay(bugData) {
 
     // Update every second
     window.ageUpdateInterval = setInterval(calculateAndDisplayAge, 1000);
+}
+
+/**
+ * Initialize the digit display structure once
+ */
+function initializeDigitDisplay() {
+    const ageDisplay = document.getElementById('bugage');
+
+    // Create the digit structure with stacked digits 0-9
+    const createDigitStack = () => {
+        let stack = '';
+        for (let n = 0; n <= 9; n++) {
+            stack += `<span style="top: ${n * 14}px">${n}</span>`;
+        }
+        return stack;
+    };
+
+    const ageHTML = `
+        <span class="age-label">Age:</span>
+        <span class="digit-container" data-unit="days">
+            <span class="digit-stack">${createDigitStack()}</span>
+            <span class="digit-stack">${createDigitStack()}</span>
+            <span class="digit-stack">${createDigitStack()}</span>
+        </span><span class="unit-letter unit-days">d</span>
+        <span class="digit-container" data-unit="hours">
+            <span class="digit-stack">${createDigitStack()}</span>
+            <span class="digit-stack">${createDigitStack()}</span>
+        </span><span class="unit-letter unit-hours">h</span>
+        <span class="digit-container" data-unit="minutes">
+            <span class="digit-stack">${createDigitStack()}</span>
+            <span class="digit-stack">${createDigitStack()}</span>
+        </span><span class="unit-letter unit-minutes">m</span>
+        <span class="digit-container" data-unit="seconds">
+            <span class="digit-stack">${createDigitStack()}</span>
+            <span class="digit-stack">${createDigitStack()}</span>
+        </span><span class="unit-letter unit-seconds">s</span>
+    `;
+
+    ageDisplay.innerHTML = ageHTML;
+}
+
+/**
+ * Update digits with scrolling animation
+ * @param {string} unit - The time unit (days, hours, minutes, seconds)
+ * @param {number} oldValue - Previous value
+ * @param {number} newValue - New value
+ */
+function updateDigitsWithAnimation(unit, oldValue, newValue) {
+    if (oldValue === newValue) return;
+
+    const container = document.querySelector(`.digit-container[data-unit="${unit}"]`);
+    if (!container) return;
+
+    // Get the digit string representations
+    const oldDigits = String(oldValue).padStart(unit === 'days' ? 3 : 2, '0');
+    const newDigits = String(newValue).padStart(unit === 'days' ? 3 : 2, '0');
+
+    // Update only digits that have changed
+    for (let i = 0; i < oldDigits.length; i++) {
+        if (oldDigits[i] !== newDigits[i]) {
+            const digitStack = container.children[i];
+            const digit = parseInt(newDigits[i], 10);
+            const translateY = -digit * 14; // Each digit is 14px tall
+
+            // Apply transform to all spans in the stack
+            const spans = digitStack.querySelectorAll('span');
+            spans.forEach(span => {
+                span.style.transform = `translateY(${translateY}px)`;
+            });
+        }
+    }
+}
+
+/**
+ * Create HTML for scrolling digit age display
+ * @param {number} days - Days
+ * @param {number} hours - Hours
+ * @param {number} minutes - Minutes
+ * @param {number} seconds - Seconds
+ * @returns {string} HTML string
+ */
+function createScrollingAgeDisplay(days, hours, minutes, seconds) {
+    const padNumber = (num, digits) => String(num).padStart(digits, '0');
+
+    const createDigitContainer = (value, unit) => {
+        const digits = padNumber(value, unit === 'days' ? 3 : 2);
+        const spans = digits.split('').map(digit =>
+            `<span class="digit-scroll">${digit}</span>`
+        ).join('');
+        return `<span class="digit-container" data-unit="${unit}">${spans}</span>`;
+    };
+
+    return `
+        <span class="age-label">Age:</span>
+        ${createDigitContainer(days, 'days')}d
+        ${createDigitContainer(hours, 'hours')}h
+        ${createDigitContainer(minutes, 'minutes')}m
+        ${createDigitContainer(seconds, 'seconds')}s
+    `;
+}
+
+/**
+ * Animate digit change with scrolling effect
+ * @param {string} unit - The time unit (days, hours, minutes, seconds)
+ * @param {number} oldValue - Previous value
+ * @param {number} newValue - New value
+ */
+function animateDigitChange(unit, oldValue, newValue) {
+    if (oldValue === newValue) return;
+
+    const container = document.querySelector(`.digit-container[data-unit="${unit}"]`);
+    if (!container) return;
+
+    // Get the digit string representations
+    const oldDigits = String(oldValue).padStart(unit === 'days' ? 3 : 2, '0');
+    const newDigits = String(newValue).padStart(unit === 'days' ? 3 : 2, '0');
+
+    // Find which digits changed and animate them
+    for (let i = 0; i < oldDigits.length; i++) {
+        if (oldDigits[i] !== newDigits[i]) {
+            const digitElement = container.children[i];
+            if (digitElement) {
+                // Remove any existing animation classes
+                digitElement.classList.remove('scroll-up', 'scroll-down');
+
+                // Set up the animation: create both old and new digits
+                const oldDigit = oldDigits[i];
+                const newDigit = newDigits[i];
+
+                // Create the animation sequence
+                animateSingleDigit(digitElement, oldDigit, newDigit);
+            }
+        }
+    }
+}
+
+/**
+ * Animate a single digit change
+ * @param {HTMLElement} digitElement - The digit span element
+ * @param {string} oldDigit - The old digit character
+ * @param {string} newDigit - The new digit character
+ */
+function animateSingleDigit(digitElement, oldDigit, newDigit) {
+    // Set the current digit
+    digitElement.textContent = oldDigit;
+    digitElement.style.top = '0px';
+
+    // Force a reflow to ensure the initial state is applied
+    digitElement.offsetHeight;
+
+    // Start the scroll animation
+    digitElement.style.top = '-14px';
+
+    // After animation completes, update to new digit
+    setTimeout(() => {
+        digitElement.textContent = newDigit;
+        digitElement.style.top = '0px';
+    }, 300);
 }
 
 /**
@@ -350,17 +521,13 @@ document.addEventListener('DOMContentLoaded', function() {
  * Copy the current bug age to clipboard with visual feedback
  */
 function copyAgeToClipboard() {
-    const bugAgeElement = document.getElementById('bugage');
-    const currentAge = bugAgeElement.textContent;
+    const ageToCopy = getVisibleAgeText();
 
     // Don't copy if age is not available
-    if (!currentAge || currentAge === 'N/A' || currentAge === 'Date is still Loading..') {
+    if (!ageToCopy || ageToCopy === 'N/A' || ageToCopy === 'Date is still Loading..') {
         console.log('No age available to copy');
         return;
     }
-
-    // Copy the full age text including "Age: " prefix
-    const ageToCopy = currentAge;
 
     // Use the Clipboard API if available, fallback to execCommand
     if (navigator.clipboard && window.isSecureContext) {
@@ -373,6 +540,88 @@ function copyAgeToClipboard() {
     } else {
         fallbackCopyTextToClipboard(ageToCopy);
     }
+}
+
+/**
+ * Get the visible age text by reading the current digit positions
+ * @returns {string} The visible age text
+ */
+function getVisibleAgeText() {
+    const bugAgeElement = document.getElementById('bugage');
+    if (!bugAgeElement || bugAgeElement.textContent === 'N/A') {
+        return 'N/A';
+    }
+
+    let visibleText = 'Age: ';
+
+    // Get days
+    const daysContainer = bugAgeElement.querySelector('.digit-container[data-unit="days"]');
+    if (daysContainer) {
+        visibleText += getVisibleDigits(daysContainer) + 'd ';
+    }
+
+    // Get hours
+    const hoursContainer = bugAgeElement.querySelector('.digit-container[data-unit="hours"]');
+    if (hoursContainer) {
+        visibleText += getVisibleDigits(hoursContainer) + 'h ';
+    }
+
+    // Get minutes
+    const minutesContainer = bugAgeElement.querySelector('.digit-container[data-unit="minutes"]');
+    if (minutesContainer) {
+        visibleText += getVisibleDigits(minutesContainer) + 'm ';
+    }
+
+    // Get seconds
+    const secondsContainer = bugAgeElement.querySelector('.digit-container[data-unit="seconds"]');
+    if (secondsContainer) {
+        visibleText += getVisibleDigits(secondsContainer) + 's';
+    }
+
+    return visibleText.trim();
+}
+
+/**
+ * Get visible digits from a digit container
+ * @param {HTMLElement} container - The digit container element
+ * @returns {string} The visible digits as a string
+ */
+function getVisibleDigits(container) {
+    let digits = '';
+
+    // For each digit stack in the container
+    for (let i = 0; i < container.children.length; i++) {
+        const digitStack = container.children[i];
+        const spans = digitStack.querySelectorAll('span');
+
+        // Find which span is currently visible (effective position closest to 0)
+        let visibleDigit = '0';
+        let closestDistance = Infinity;
+
+        spans.forEach(span => {
+            // Get initial top position
+            const topMatch = span.style.top.match(/(\d+)px/);
+            const initialTop = topMatch ? parseInt(topMatch[1], 10) : 0;
+
+            // Get transform translateY
+            const transform = span.style.transform || '';
+            const translateYMatch = transform.match(/translateY\(([-0-9]+)px\)/);
+            const translateY = translateYMatch ? parseInt(translateYMatch[1], 10) : 0;
+
+            // Calculate effective position
+            const effectiveTop = initialTop + translateY;
+            const distance = Math.abs(effectiveTop);
+
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                visibleDigit = span.textContent;
+            }
+        });
+
+        digits += visibleDigit;
+    }
+
+    return digits;
 }
 
 /**
@@ -439,16 +688,22 @@ function updateBugIdDisplay(bugId) {
  */
 function showCopyFeedback(copiedAge) {
     const bugAgeElement = document.getElementById('bugage');
-    const originalText = bugAgeElement.textContent;
 
-    // Visual feedback: change text and color briefly
-    bugAgeElement.textContent = 'Copied!';
-    bugAgeElement.style.color = '#28a745'; // Green color
+    // Store current display state
+    const originalDisplay = bugAgeElement.style.display;
+    const originalInnerHTML = bugAgeElement.innerHTML;
 
-    // Restore original text and remove inline color after 1 second
+    // Temporarily hide the age display and show "Copied!" message
+    bugAgeElement.style.display = 'none';
+    bugAgeElement.insertAdjacentHTML('afterend', '<div id="copy-feedback" style="color: #28a745; font-weight: bold; font-family: \'Segoe UI\', Tahoma, sans-serif; font-size: 12px; position: absolute; right: 0; top: 2px;">Copied!</div>');
+
+    // Restore after 1 second
     setTimeout(function() {
-        bugAgeElement.textContent = originalText;
-        bugAgeElement.style.color = ''; // Remove inline color to let CSS classes take over
+        const feedbackElement = document.getElementById('copy-feedback');
+        if (feedbackElement) {
+            feedbackElement.remove();
+        }
+        bugAgeElement.style.display = originalDisplay;
     }, 1000);
 
     console.log('Age copied to clipboard:', copiedAge);
