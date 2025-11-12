@@ -76,30 +76,29 @@ function extractBugCreationData() {
         }
 
         // Parse timestamp with proper timezone handling
-        const timestampMatch = timeText.match(/(\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2})/);
+        const timestampMatch = timeText.match(/(\d{4}-\d{2}-\d{2}\s\d{2}:\d{2})/);
         if (!timestampMatch) {
             return null;
         }
 
-        const timestamp = timestampMatch[1];
+        let timestamp = timestampMatch[1];
         let timezoneOffset = 0;
 
-        // Check for timezone indicators and calculate offset to UTC
+        // Check for timezone indicators
         if (timeText.includes('PST')) {
-            timezoneOffset = 8; // PST is UTC-8, so add 8 hours to get to UTC
+            timezoneOffset = 8; // Hours to add to get to UTC
         } else if (timeText.includes('PDT')) {
-            timezoneOffset = 7; // PDT is UTC-7, so add 7 hours to get to UTC
+            timezoneOffset = 7; // Hours to add to get to UTC
         }
 
-        // Create date object with proper timezone adjustment
+        // Create date object and adjust for timezone
         const dateParts = timestamp.split(/[- :]/);
         const bugDate = new Date(
             parseInt(dateParts[0]), // year
             parseInt(dateParts[1]) - 1, // month (0-based)
             parseInt(dateParts[2]), // day
             parseInt(dateParts[3]) + timezoneOffset, // hour adjusted to UTC
-            parseInt(dateParts[4]), // minute
-            parseInt(dateParts[5]) || 0 // second (default to 0 if not present)
+            parseInt(dateParts[4]) // minute
         );
 
         if (isNaN(bugDate.getTime())) {

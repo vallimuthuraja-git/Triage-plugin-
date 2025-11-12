@@ -9,36 +9,9 @@
 </head>
 
 <body>
-	<div class="popup-container">
-		<!-- Bug Information Section -->
-		<div class="bug-info-section">
-			<div class="bug-info-card">
-				<div class="bug-header-row">
-					<div class="bug-id-display">
-						<span id='bugid'>Bug ID: Loading...</span>
-					</div>
-					<div class="header-actions">
-						<button id="refreshData" title="Refresh data from page" class="refresh-button">
-							<span class="refresh-icon">&#8635;</span>
-						</button>
-						<button id="reset-whiteboard" title="Reset whiteboard to current bug content" class="reset-button">
-							<span class="reset-icon">&#8634;</span>
-						</button>
-						<button id="settings-btn" title="Settings" class="settings-button">
-							<span class="settings-icon">&#9881;</span>
-						</button>
-					</div>
-				</div>
-				<div class="age-display-container">
-					<span id='bugage' class="age-value">Date is still Loading..</span>
-				</div>
-				<div class="age-highlight-section">
-					<h4 class="section-title">Whiteboard</h4>
-					<div id='pagetitle' class="whiteboard-text">Page is still Loading..</div>
-				</div>
-				<div id='errmsg' class="error-message"></div>
-			</div>
-		</div>
+	<div>
+		<button id="settings-btn" title="Settings" class="settings-button">&#9881;</button>
+		<h3><span id='bugid'>Bug ID: Loading...</span> <button id="refreshData" title="Refresh data from page"><span class="refresh-icon">&#8635;</span></button> <span id='bugage'>Date is still Loading..</span></h3>
 
 		<!-- Settings Panel -->
 		<div id="settings-panel" class="settings-panel">
@@ -89,101 +62,73 @@
 				</div>
 			</div>
 		</div>
+		<h4 style="color: #555; font-size: 14px; font-weight: bold; margin: 10px 0 5px 0; border-bottom: 1px solid #ddd; padding-bottom: 3px; position: relative;">Whiteboard!! <button id="reset-whiteboard" title="Reset whiteboard to current bug content" style="position: absolute; right: 0; top: 0; font-size: 11px; padding: 2px 8px;">Reset Whiteboard</button></h4>
+		<p id='pagetitle'>Page is still Loading..</p>
+		<p id='errmsg'></p>
 		<script src="clickEvents.js"></script>
-		<!-- ETA Section -->
 		<div class="eta-section">
-			<div class="section-header">
-				<h4 class="section-title">ETA (Business Days)</h4>
-			</div>
-			<div class="eta-content">
-				<div class="eta-slider-container">
-					<input type="range" id="eta-slider" min="0" max="8" value="0" step="1">
-					<div class="slider-controls">
-						<div class="slider-labels">
-							<span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span>
-						</div>
-						<button id="clear-eta" title="Clear ETA tags from whiteboard" class="clear-eta-button">
-							Clear ETA
-						</button>
-					</div>
+			<h4>ETA (Business Days) <button id="clear-eta" title="Clear ETA tags from whiteboard">Clear ETA</button></h4>
+			<div class="eta-slider-container">
+				<input type="range" id="eta-slider" min="0" max="8" value="0" step="1">
+				<div class="slider-labels">
+					<span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span>
 				</div>
 			</div>
-		</div>
+			</div>
 
-		<!-- Tags Section -->
 		<div class="tags-section">
-			<div class="section-header">
-				<h4 class="section-title">Quick Tags</h4>
+			<h4>Quick Tags</h4>
+			<div class="action-buttons">
+				<button id="execute"><b>Execute</b></button>
 			</div>
-			<div class="tags-content">
-				<div class="action-section">
-					<button id="execute" class="execute-button">
-						<span class="execute-icon">&#9654;</span>
-						Execute
-					</button>
+			<div class="frequent-tags">
+				<h5>Frequently Used Tags</h5>
+				<div class="frequent-tag-buttons">
+					<!-- Dynamically populated based on usage -->
 				</div>
-
-				<div class="frequent-tags">
-					<h5 class="subsection-title">Frequently Used</h5>
-					<div class="frequent-tag-buttons">
-						<!-- Dynamically populated based on usage -->
-					</div>
-				</div>
-
-				<div class="search-section">
-					<div class="search-input-container">
-						<input type="text" id="tag-search" placeholder="Search tags..." />
-					</div>
-				</div>
-
-				<div class="tag-buttons">
-					<button id="JN_TRIAGED">JN_TRIAGED</button>
-					<button id="Complete_fail">Site_100%_failure</button>
-					<button id="Logs_Expired_User_Sepecific">Logs_Expired_User_Sepecific</button>
-					<button id="Navigation_Required_User_Sepecific">Navigation_Required_User_Sepecific</button>
-					<button id="Fixed_MFA_User_need_to_confirm">Fixed_MFA_User_need_to_confirm</button>
-					<button id="Fixed_NON_MFA_User_need_to_confirm">Fixed_NON_MFA_User_need_to_confirm</button>
-					<button id="More_Clarification_Required">More_Clarification_Required</button>
-					<button id="UUI_Closed">UUI_Closed</button>
-					<button id="UUI_DQ_Issues">UUI_DQ_Issues</button>
-					<button id="UUI_Reopen_Issues">UUI_Reopen_Issues</button>
-					<button id="UUI_Aged_Bug">UUI_Aged_Bug</button>
-					<button id="UUI_MFA_Issue">UUI_MFA_Issue</button>
-					<button id="UUI_Infra_Issue">UUI_Infra_Issue</button>
-					<button id="UUI_Feed_Issue">UUI_Feed_Issue</button>
-					<button id="UUI_TTR_Issues">UUI_TTR_Issues</button>
-					<button id="UUI_Complete_Site_Handling">UUI_Complete_Site_Handling</button>
-					<button id="UUI_IAV_flow_issue">UUI_IAV_flow_issue</button>
-					<button id="UUI_Info_Issue">UUI_Info_Issue</button>
-					<button id="UUI_Non_Info_ABS_CR_Metadata_YAD_DB_Update">UUI_Non_Info_ABS_CR_Metadata_YAD_DB_Update</button>
-					<button id="UUI_Tool_Issue_Time_Out">UUI_Tool_Issue_Time_Out</button>
-					<button id="UUI_Tool_Issue_Deployment_Failed">UUI_Tool_Issue_Deployment_Failed</button>
-					<button id="UUI_Tool_Issue_No_Data_Found">UUI_Tool_Issue_No_Data_Found</button>
-					<button id="UUI_Tool_Issue_Firemen_Failing">UUI_Tool_Issue_Firemen_Failing</button>
-					<button id="UUI_Tool_Issue_Missing_ST">UUI_Tool_Issue_Missing_ST</button>
-					<button id="UUI_Tool_Issue_Incorrect_ST">UUI_Tool_Issue_Incorrect_ST</button>
-					<button id="UUI_Tool_Issue_Missing_Error_Code">UUI_Tool_Issue_Missing_Error_Code</button>
-					<button id="UUI_Tool_Issue_Direct_Closure_Option">UUI_Tool_Issue_Direct_Closure_Option</button>
-					<button id="UUI_Tool_Issue_FMPA_Enable_PagePrint_Close">UUI_Tool_Issue_FMPA_Enable_PagePrint_Close</button>
-					<button id="UUI_Tool_Issue_Version_Mismatch">UUI_Tool_Issue_Version_Mismatch</button>
-					<button id="UUI_Tool_Issue_Soft_Error_Placards">UUI_Tool_Issue_Soft_Error_Placards</button>
-					<button id="UUI_Tool_Issue_Analyze_Fix_Verify_Not_Enable">UUI_Tool_Issue_Analyze-Fix-Verify_Not_Enable</button>
-					<button id="UUI_Tool_Issue_Dump_Expire">UUI_Tool_Issue_Dump_Expire</button>
-					<button id="UUI_Tool_Issue_Temporary_Issue">UUI_Tool_Issue_Temporary_Issue</button>
-					<button id="UUI_Tool_Issue_Tool_Down">UUI_Tool_Issue_Tool_Down</button>
-					<button id="UUI_Tool_Issue">UUI_Tool_Issue</button>
-				</div>
+			</div>
+			<div class="search-section">
+				<input type="text" id="tag-search" placeholder="Search tags..." />
+			</div>
+			<div class="tag-buttons">
+				<button id="JN_TRIAGED">JN_TRIAGED</button><button id="Complete_fail">Site_100%_failure</button>
+				<button id="Logs_Expired_User_Sepecific">Logs_Expired_User_Sepecific</button>
+				<button id="Navigation_Required_User_Sepecific">Navigation_Required_User_Sepecific</button>
+				<button id="Fixed_MFA_User_need_to_confirm">Fixed_MFA_User_need_to_confirm</button>
+				<button id="Fixed_NON_MFA_User_need_to_confirm">Fixed_NON_MFA_User_need_to_confirm</button>
+				<button id="More_Clarification_Required">More_Clarification_Required</button>
+				<button id="UUI_Closed">UUI_Closed</button>
+				<button id="UUI_DQ_Issues">UUI_DQ_Issues</button>
+				<button id="UUI_Reopen_Issues">UUI_Reopen_Issues</button>
+				<button id="UUI_Aged_Bug">UUI_Aged_Bug</button>
+				<button id="UUI_MFA_Issue">UUI_MFA_Issue</button>
+				<button id="UUI_Infra_Issue">UUI_Infra_Issue</button>
+				<button id="UUI_Feed_Issue">UUI_Feed_Issue</button>
+				<button id="UUI_TTR_Issues">UUI_TTR_Issues</button>
+				<button id="UUI_Complete_Site_Handling">UUI_Complete_Site_Handling</button>
+				<button id="UUI_IAV_flow_issue">UUI_IAV_flow_issue</button>
+				<button id="UUI_Info_Issue">UUI_Info_Issue</button>
+				<button id="UUI_Non_Info_ABS_CR_Metadata_YAD_DB_Update">UUI_Non_Info_ABS_CR_Metadata_YAD_DB_Update</button>
+				<button id="UUI_Tool_Issue_Time_Out">UUI_Tool_Issue_Time_Out</button>
+				<button id="UUI_Tool_Issue_Deployment_Failed">UUI_Tool_Issue_Deployment_Failed</button>
+				<button id="UUI_Tool_Issue_No_Data_Found">UUI_Tool_Issue_No_Data_Found</button>
+				<button id="UUI_Tool_Issue_Firemen_Failing">UUI_Tool_Issue_Firemen_Failing</button>
+				<button id="UUI_Tool_Issue_Missing_ST">UUI_Tool_Issue_Missing_ST</button>
+				<button id="UUI_Tool_Issue_Incorrect_ST">UUI_Tool_Issue_Incorrect_ST</button>
+				<button id="UUI_Tool_Issue_Missing_Error_Code">UUI_Tool_Issue_Missing_Error_Code</button>
+				<button id="UUI_Tool_Issue_Direct_Closure_Option">UUI_Tool_Issue_Direct_Closure_Option</button>
+				<button id="UUI_Tool_Issue_FMPA_Enable_PagePrint_Close">UUI_Tool_Issue_FMPA_Enable_PagePrint_Close</button>
+				<button id="UUI_Tool_Issue_Version_Mismatch">UUI_Tool_Issue_Version_Mismatch</button>
+				<button id="UUI_Tool_Issue_Soft_Error_Placards">UUI_Tool_Issue_Soft_Error_Placards</button>
+				<button id="UUI_Tool_Issue_Analyze_Fix_Verify_Not_Enable">UUI_Tool_Issue_Analyze-Fix-Verify_Not_Enable</button>
+				<button id="UUI_Tool_Issue_Dump_Expire">UUI_Tool_Issue_Dump_Expire</button>
+				<button id="UUI_Tool_Issue_Temporary_Issue">UUI_Tool_Issue_Temporary_Issue</button>
+				<button id="UUI_Tool_Issue_Tool_Down">UUI_Tool_Issue_Tool_Down</button>
+				<button id="UUI_Tool_Issue">UUI_Tool_Issue</button>
 			</div>
 		</div>
-
-		<!-- Footer -->
-		<div class="footer-section">
-			<div class="contact-info">
-				<p class="contact-text">
-					For issues or suggestions: <strong>Ayush Agarwal</strong>
-				</p>
-			</div>
-		</div>
+		<br>
+		<h5>For any Issue or Suggestion contact <br>Ayush Agarwal</h5>
 	</div>
 </body>
 
