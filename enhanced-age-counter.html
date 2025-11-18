@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Bug Age Counter Demo</title>
+    <style>
+        /* CSS Custom Properties for Theming */
+        :root {
+            --bg-primary: #f9f9f9;
+            --bg-secondary: #ffffff;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --text-accent: #2563eb;
+            --border-primary: #e2e8f0;
+            --success: #28a745;
+            --warning: #ffd700;
+            --error: #dc3545;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            margin: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .demo-container {
+            background: var(--bg-secondary);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--text-accent);
+            margin-bottom: 30px;
+        }
+
+        h3 {
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--text-accent);
+            padding-bottom: 8px;
+            margin-bottom: 20px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        /* Enhanced Age Display Container */
+        #bugage {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px; /* Increased spacing between elements */
+            min-width: 120px; /* Increased for better readability */
+            height: 24px; /* Increased height for better touch targets */
+            padding: 6px 12px; /* More generous padding */
+            margin-right: 8px;
+
+            /* Enhanced Typography */
+            font-family: Arial, sans-serif; /* Clear, legible sans-serif */
+            font-size: 15px; /* Slightly larger for better readability */
+            font-weight: 600; /* Bolder weight */
+            line-height: 1;
+            color: var(--text-accent);
+
+            /* Enhanced Background and Border */
+            background-color: var(--bg-secondary);
+            border: 1px solid #e0e7ff;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+
+            /* Better Interaction */
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s ease; /* Smooth transitions */
+
+            position: absolute;
+            right: 0;
+            top: 2px;
+        }
+
+        /* Enhanced Clock Icon */
+        #bugage::before {
+            content: "\23F1"; /* Clock emoji */
+            font-size: 16px;
+            color: var(--text-secondary);
+            font-weight: 900;
+            margin-right: 4px;
+            filter: drop-shadow(0 1px 1px rgba(0,0,0,0.1)); /* Subtle shadow */
+        }
+
+        /* Age Label Enhancement */
+        #bugage .age-label {
+            font-weight: 700;
+            color: var(--text-accent);
+            margin-right: 6px;
+            font-size: 14px;
+        }
+
+        /* Enhanced Scrolling Digit Containers */
+        .digit-container {
+            display: inline-block;
+            position: relative;
+            vertical-align: baseline;
+            font-family: Arial, sans-serif;
+            font-size: 16px; /* Larger digits for readability */
+            font-weight: 700; /* Bolder digits */
+            line-height: 1;
+        }
+
+        /* Enhanced Unit Letters (d, h, m, s) */
+        .unit-letter {
+            vertical-align: baseline;
+            margin-left: 3px;
+            margin-right: 8px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            font-weight: 400; /* Less visual weight than numbers */
+            color: var(--text-secondary);
+            opacity: 0.75; /* Subtle opacity */
+        }
+
+        /* Visual Separators (subtle vertical lines) */
+        .unit-days::before,
+        .unit-hours::before,
+        .unit-minutes::before {
+            content: "|";
+            color: var(--text-accent);
+            opacity: 0.3;
+            margin-right: 6px;
+            font-weight: 200;
+        }
+
+        .digit-stack {
+            display: inline-block;
+            width: 8px; /* Slightly wider */
+            height: 15px; /* Increased height */
+            overflow: hidden;
+            position: relative;
+            line-height: 15px;
+            margin-right: 1px;
+        }
+
+        .digit-stack span {
+            display: block;
+            position: absolute;
+            width: 100%;
+            height: 15px;
+            line-height: 15px;
+            text-align: center;
+            transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            top: 0;
+            font-weight: 700;
+        }
+
+        /* Age-based color coding with enhanced styling */
+        #bugage.age-recent {
+            color: var(--success);
+            background-color: rgba(40, 167, 69, 0.1); /* Subtle background tint */
+            border-color: rgba(40, 167, 69, 0.3);
+            box-shadow: 0 1px 3px rgba(40, 167, 69, 0.2);
+        }
+
+        #bugage.age-recent::before {
+            color: var(--success);
+        }
+
+        #bugage.age-recent .unit-letter {
+            color: rgba(40, 167, 69, 0.7);
+        }
+
+        #bugage.age-recent .unit-days::before,
+        #bugage.age-recent .unit-hours::before,
+        #bugage.age-recent .unit-minutes::before {
+            color: rgba(40, 167, 69, 0.4);
+        }
+
+        #bugage.age-medium {
+            color: #ffd700; /* More accessible yellow */
+            background-color: rgba(255, 215, 0, 0.1);
+            border-color: rgba(255, 215, 0, 0.3);
+            box-shadow: 0 1px 3px rgba(255, 215, 0, 0.2);
+        }
+
+        #bugage.age-medium::before {
+            color: #ffd700;
+        }
+
+        #bugage.age-medium .unit-letter {
+            color: rgba(255, 215, 0, 0.7);
+        }
+
+        #bugage.age-medium .unit-days::before,
+        #bugage.age-medium .unit-hours::before,
+        #bugage.age-medium .unit-minutes::before {
+            color: rgba(255, 215, 0, 0.4);
+        }
+
+        #bugage.age-old {
+            color: var(--error);
+            background-color: rgba(231, 76, 60, 0.1);
+            border-color: rgba(231, 76, 60, 0.3);
+            box-shadow: 0 1px 3px rgba(231, 76, 60, 0.2);
+        }
+
+        #bugage.age-old::before {
+            color: var(--error);
+        }
+
+        #bugage.age-old .unit-letter {
+            color: rgba(231, 76, 60, 0.7);
+        }
+
+        #bugage.age-old .unit-days::before,
+        #bugage.age-old .unit-hours::before,
+        #bugage.age-old .unit-minutes::before {
+            color: rgba(231, 76, 60, 0.4);
+        }
+
+        /* Micro-interactions for value changes */
+        .digit-changed {
+            animation: digitPulse 0.6s ease;
+        }
+
+        @keyframes digitPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+
+        /* Hover state enhancement */
+        #bugage:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        #bugage:hover::before {
+            animation: clockTick 1s ease-in-out;
+        }
+
+        @keyframes clockTick {
+            0% { transform: rotate(0deg); }
+            25% { transform: rotate(-10deg); }
+            50% { transform: rotate(0deg); }
+            75% { transform: rotate(10deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        /* Focus state for accessibility */
+        #bugage:focus {
+            outline: 2px solid var(--text-accent);
+            outline-offset: 2px;
+        }
+
+        #bugid {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-accent);
+            background-color: #f8fafc;
+            padding: 3px 8px 3px 5px;
+            border-radius: 8px;
+            border: 1px solid #d1e0ff;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            min-width: 100px;
+            justify-content: center;
+            height: 24px;
+            line-height: 1;
+            user-select: none;
+        }
+
+        .demo-controls {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        button {
+            background-color: var(--text-accent);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #1d4ed8;
+        }
+
+        .demo-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 6px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <h1>Enhanced Bug Age Counter Demo</h1>
+
+        <h3>
+            <span id='bugid'>Bug ID: DEMO-123</span>
+            <span id='bugage'>Date is still Loading..</span>
+        </h3>
+
+        <div class="demo-controls">
+            <button onclick="simulateBugData()">Start Demo Counter</button>
+            <button onclick="copyAgeToClipboard()">Copy Age</button>
+            <button onclick="simulateAgeChange()">Simulate Time Change</button>
+        </div>
+
+        <div class="demo-info">
+            <strong>Features Demonstrated:</strong>
+            <ul>
+                <li>Scrolling digit animations with 0.5s cubic-bezier transitions</li>
+                <li>Enhanced typography (bold digits, clear fonts)</li>
+                <li>Improved spacing (10px gaps, generous padding)</li>
+                <li>Visual separators between time units (|)</li>
+                <li>Age-based color coding (green/new, yellow/medium, red/old)</li>
+                <li>Clock icon with hover animations (ticking effect)</li>
+                <li>Micro-interactions (digit pulsing when values change)</li>
+                <li>Accessibility features (ARIA labels, focus states)</li>
+                <li>Click-to-copy functionality</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * Initialize the digit display structure once with accessibility enhancements
+         */
+        function initializeDigitDisplay() {
+            const ageDisplay = document.getElementById('bugage');
+
+            // Create the digit structure with stacked digits 0-9
+            const createDigitStack = () => {
+                let stack = '';
+                for (let n = 0; n <= 9; n++) {
+                    stack += `<span style="top: ${n * 15}px" data-digit="${n}">${n}</span>`;
+                }
+                return stack;
+            };
+
+            // Enhanced HTML with ARIA labels and semantic structure
+            const ageHTML = `
+                <span class="age-label" aria-label="Bug age timer">Age:</span>
+                <span class="digit-container" data-unit="days" aria-label="Days" role="timer">
+                    <span class="digit-stack" aria-live="polite">${createDigitStack()}</span>
+                    <span class="digit-stack" aria-live="polite">${createDigitStack()}</span>
+                    <span class="digit-stack" aria-live="polite">${createDigitStack()}</span>
+                </span><span class="unit-letter unit-days" aria-label="days">d</span>
+                <span class="digit-container" data-unit="hours" aria-label="Hours" role="timer">
+                    <span class="digit-stack" aria-live="polite">${createDigitStack()}</span>
+                    <span class="digit-stack" aria-live="polite">${createDigitStack()}</span>
+                </span><span class="unit-letter unit-hours" aria-label="hours">h</span>
+                <span class="digit-container" data-unit="minutes" aria-label="Minutes" role="timer">
+                    <span class="digit-stack" aria-live="polite">${createDigitStack()}</span>
+                    <span class="digit-stack" aria-live="polite">${createDigitStack()}</span>
+                </span><span class="unit-letter unit-minutes" aria-label="minutes">m</span>
+                <span class="digit-container" data-unit="seconds" aria-label="Seconds" role="timer">
+                    <span class="digit-stack" aria-live="polite">${createDigitStack()}</span>
+                    <span class="digit-stack" aria-live="polite">${createDigitStack()}</span>
+                </span><span class="unit-letter unit-seconds" aria-label="seconds">s</span>
+            `;
+
+            ageDisplay.innerHTML = ageHTML;
+
+            // Set ARIA attributes on the main container
+            ageDisplay.setAttribute('role', 'region');
+            ageDisplay.setAttribute('aria-label', 'Bug age display');
+            ageDisplay.setAttribute('tabindex', '0'); // Make focusable for accessibility
+
+            // Make clickable for copy functionality
+            ageDisplay.addEventListener('click', function() {
+                copyAgeToClipboard();
+            });
+            ageDisplay.style.cursor = 'pointer';
+            ageDisplay.title = 'Click to copy age';
+        }
+
+        /**
+         * Update digits with scrolling animation and micro-interactions
+         * @param {string} unit - The time unit (days, hours, minutes, seconds)
+         * @param {number} oldValue - Previous value
+         * @param {number} newValue - New value
+         */
+        function updateDigitsWithAnimation(unit, oldValue, newValue) {
+            if (oldValue === newValue) return;
+
+            const container = document.querySelector(`.digit-container[data-unit="${unit}"]`);
+            if (!container) return;
+
+            // Get the digit string representations
+            const oldDigits = String(oldValue).padStart(unit === 'days' ? 3 : 2, '0');
+            const newDigits = String(newValue).padStart(unit === 'days' ? 3 : 2, '0');
+
+            // Track if any digits changed for micro-interaction
+            let hasChanges = false;
+
+            // Update only digits that have changed
+            for (let i = 0; i < oldDigits.length; i++) {
+                if (oldDigits[i] !== newDigits[i]) {
+                    hasChanges = true;
+                    const digitStack = container.children[i];
+                    const digit = parseInt(newDigits[i], 10);
+                    const translateY = -digit * 15; // Updated height to match CSS
+
+                    // Add digit change animation class
+                    digitStack.classList.add('digit-changed');
+
+                    // Apply transform to all spans in the stack
+                    const spans = digitStack.querySelectorAll('span');
+                    spans.forEach(span => {
+                        span.style.transform = `translateY(${translateY}px)`;
+                    });
+
+                    // Remove animation class after animation completes
+                    setTimeout(() => {
+                        digitStack.classList.remove('digit-changed');
+                    }, 600); // Match CSS animation duration
+                }
+            }
+
+            // Add subtle visual feedback for the entire unit when value changes
+            if (hasChanges) {
+                container.classList.add('digit-changed');
+                setTimeout(() => {
+                    container.classList.remove('digit-changed');
+                }, 600);
+            }
+        }
+
+        /**
+         * Update age display with live seconds and scrolling digit animation
+         * @param {Object} bugData - Bug creation data {timestamp, idleDays}
+         */
+        function updateAgeDisplay(bugData) {
+            // Clear any existing age update interval
+            if (window.ageUpdateInterval) {
+                clearInterval(window.ageUpdateInterval);
+                window.ageUpdateInterval = null;
+            }
+
+            if (!bugData || !bugData.timestamp) {
+                document.getElementById('bugage').innerHTML = 'N/A';
+                return;
+            }
+
+            // Initialize the digit display structure
+            initializeDigitDisplay();
+
+            const bugTimestamp = new Date(bugData.timestamp).getTime();
+            const idleMs = (bugData.idleDays || 0) * 24 * 60 * 60 * 1000;
+
+            function calculateAndDisplayAge() {
+                const now = Date.now();
+                let ageMs = now - bugTimestamp;
+                ageMs -= idleMs; // Subtract idle time
+
+                // Ensure non-negative age
+                ageMs = Math.max(0, ageMs);
+
+                const ageinseconds = Math.floor(ageMs / 1000);
+                const days = Math.floor(ageinseconds / 86400);
+                const hours = Math.floor((ageinseconds % 86400) / 3600);
+                const minutes = Math.floor((ageinseconds % 3600) / 60);
+                const seconds = Math.floor(ageinseconds % 60);
+
+                // Update digits with animation
+                updateDigitsWithAnimation('days', window.prevDays || 0, days);
+                updateDigitsWithAnimation('hours', window.prevHours || 0, hours);
+                updateDigitsWithAnimation('minutes', window.prevMinutes || 0, minutes);
+                updateDigitsWithAnimation('seconds', window.prevSeconds || 0, seconds);
+
+                // Store previous values
+                window.prevDays = days;
+                window.prevHours = hours;
+                window.prevMinutes = minutes;
+                window.prevSeconds = seconds;
+
+                // Apply age-based styling
+                const ageDisplay = document.getElementById('bugage');
+                updateAgeStyling(ageDisplay, days);
+            }
+
+            // Display immediately
+            calculateAndDisplayAge();
+
+            // Update every second
+            window.ageUpdateInterval = setInterval(calculateAndDisplayAge, 1000);
+        }
+
+        /**
+         * Update age display styling based on bug age
+         * @param {HTMLElement} ageElement - The age display element
+         * @param {number} days - Number of days since bug creation
+         */
+        function updateAgeStyling(ageElement, days) {
+            // Remove existing age classes
+            ageElement.classList.remove('age-recent', 'age-medium', 'age-old');
+
+            // Apply age-based styling
+            if (days < 7) {
+                ageElement.classList.add('age-recent'); // Green for recent bugs
+            } else if (days < 30) {
+                ageElement.classList.add('age-medium'); // Yellow/Orange for medium age
+            } else {
+                ageElement.classList.add('age-old'); // Red for old bugs
+            }
+        }
+
+        /**
+         * Get the visible age text by reading the current digit positions
+         * @returns {string} The visible age text
+         */
+        function getVisibleAgeText() {
+            const bugAgeElement = document.getElementById('bugage');
+            if (!bugAgeElement || bugAgeElement.textContent === 'N/A') {
+                return 'N/A';
+            }
+
+            let visibleText = 'Age: ';
+
+            // Get days
+            const daysContainer = bugAgeElement.querySelector('.digit-container[data-unit="days"]');
+            if (daysContainer) {
+                visibleText += getVisibleDigits(daysContainer) + 'd ';
+            }
+
+            // Get hours
+            const hoursContainer = bugAgeElement.querySelector('.digit-container[data-unit="hours"]');
+            if (hoursContainer) {
+                visibleText += getVisibleDigits(hoursContainer) + 'h ';
+            }
+
+            // Get minutes
+            const minutesContainer = bugAgeElement.querySelector('.digit-container[data-unit="minutes"]');
+            if (minutesContainer) {
+                visibleText += getVisibleDigits(minutesContainer) + 'm ';
+            }
+
+            // Get seconds
+            const secondsContainer = bugAgeElement.querySelector('.digit-container[data-unit="seconds"]');
+            if (secondsContainer) {
+                visibleText += getVisibleDigits(secondsContainer) + 's';
+            }
+
+            return visibleText.trim();
+        }
+
+        /**
+         * Get visible digits from a digit container
+         * @param {HTMLElement} container - The digit container element
+         * @returns {string} The visible digits as a string
+         */
+        function getVisibleDigits(container) {
+            let digits = '';
+
+            // For each digit stack in the container
+            for (let i = 0; i < container.children.length; i++) {
+                const digitStack = container.children[i];
+                const spans = digitStack.querySelectorAll('span');
+
+                // Find which span is currently visible (effective position closest to 0)
+                let visibleDigit = '0';
+                let closestDistance = Infinity;
+
+                spans.forEach(span => {
+                    // Get initial top position
+                    const topMatch = span.style.top.match(/(\d+)px/);
+                    const initialTop = topMatch ? parseInt(topMatch[1], 10) : 0;
+
+                    // Get transform translateY
+                    const transform = span.style.transform || '';
+                    const translateYMatch = transform.match(/translateY\(([-0-9]+)px\)/);
+                    const translateY = translateYMatch ? parseInt(translateYMatch[1], 10) : 0;
+
+                    // Calculate effective position
+                    const effectiveTop = initialTop + translateY;
+                    const distance = Math.abs(effectiveTop);
+
+                    if (distance < closestDistance) {
+                        closestDistance = distance;
+                        visibleDigit = span.textContent;
+                    }
+                });
+
+                digits += visibleDigit;
+            }
+
+            return digits;
+        }
+
+        /**
+         * Copy the current bug age to clipboard with visual feedback
+         */
+        function copyAgeToClipboard() {
+            const ageToCopy = getVisibleAgeText();
+
+            // Don't copy if age is not available
+            if (!ageToCopy || ageToCopy === 'N/A' || ageToCopy === 'Date is still Loading..') {
+                console.log('No age available to copy');
+                alert('No age data available to copy');
+                return;
+            }
+
+            // Use the Clipboard API if available, fallback to execCommand
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(ageToCopy).then(function() {
+                    showCopyFeedback(ageToCopy);
+                }).catch(function(err) {
+                    console.error('Failed to copy age using Clipboard API:', err);
+                    fallbackCopyTextToClipboard(ageToCopy);
+                });
+            } else {
+                fallbackCopyTextToClipboard(ageToCopy);
+            }
+        }
+
+        /**
+         * Fallback method for copying text to clipboard (for older browsers)
+         * @param {string} text - Text to copy
+         */
+        function fallbackCopyTextToClipboard(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            textArea.style.top = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showCopyFeedback(text);
+                } else {
+                    console.error('Fallback copy method failed');
+                    alert('Failed to copy to clipboard');
+                }
+            } catch (err) {
+                console.error('Fallback copy method error:', err);
+                alert('Failed to copy to clipboard');
+            }
+
+            document.body.removeChild(textArea);
+        }
+
+        /**
+         * Show visual feedback when age is copied
+         * @param {string} copiedAge - The age text that was copied
+         */
+        function showCopyFeedback(copiedAge) {
+            const bugAgeElement = document.getElementById('bugage');
+
+            // Store original content
+            const originalInnerHTML = bugAgeElement.innerHTML;
+
+            // Replace content with "COPIED" message
+            bugAgeElement.innerHTML = '<span style="color: #28a745; font-weight: bold;">COPIED</span>';
+
+            // Restore original content after 1 second
+            setTimeout(function() {
+                bugAgeElement.innerHTML = originalInnerHTML;
+            }, 1000);
+
+            console.log('Age copied to clipboard:', copiedAge);
+            alert('Age copied to clipboard: ' + copiedAge);
+        }
+
+        /**
+         * Simulate bug data for demo purposes
+         */
+        function simulateBugData() {
+            // Create mock bug data - simulate a bug that was created about 25 days ago
+            const daysAgo = 25; // You can change this to see different age colors
+            const hoursAgo = 4 + (daysAgo * 24); // Add some hours for demo
+            const minutesAgo = 32;
+            const secondsAgo = 15;
+
+            const bugTimestamp = Date.now() -
+                (daysAgo * 24 * 60 * 60 * 1000) -
+                (hoursAgo * 60 * 60 * 1000) -
+                (minutesAgo * 60 * 1000) -
+                (secondsAgo * 1000);
+
+            const mockBugData = {
+                timestamp: new Date(bugTimestamp).toISOString(),
+                idleDays: 0 // No idle days for demo
+            };
+
+            updateAgeDisplay(mockBugData);
+            document.getElementById('bugid').textContent = `Bug ID: ${Math.floor(Math.random() * 100000)}`;
+        }
+
+        /**
+         * Simulate time change to trigger animations
+         */
+        function simulateAgeChange() {
+            if (!window.ageUpdateInterval) {
+                alert('Please start the demo counter first!');
+                return;
+            }
+
+            // Temporarily speed up time for demo effect
+            clearInterval(window.ageUpdateInterval);
+
+            // Fast-forward time by adding seconds to show rolling animations
+            let demoSeconds = window.prevSeconds || 0;
+            const demoInterval = setInterval(() => {
+                demoSeconds = (demoSeconds + 45) % 60; // Add 45 seconds each tick for dramatic effect
+                updateDigitsWithAnimation('seconds', window.prevSeconds, demoSeconds);
+                window.prevSeconds = demoSeconds;
+
+                // Stop after a few seconds and resume normal operation
+                setTimeout(() => {
+                    clearInterval(demoInterval);
+                    simulateBugData(); // Restart normal counter
+                }, 3000);
+            }, 300);
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Enhanced Bug Age Counter Demo loaded');
+        });
+    </script>
+</body>
+</html>
